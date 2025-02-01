@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: ilias
-          image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}
+          image: {{ .Values.iliasRPCServer.image }}:{{ .Values.iliasRPCServer.tag }}
           command: ["java", "-jar", "ilServer.jar", "ilServer.properties", "start"]
           securityContext:
             allowPrivilegeEscalation: false
@@ -34,7 +34,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           ports:
-            - containerPort: {{ .Values.ilias.port }}
+            - containerPort: {{ .Values.iliasRPCServer.port }}
           env:
             - name: ILSERVER_LOGLEVEL
               value: {{ .Values.iliasRPCServer.logLevel | quote }}
