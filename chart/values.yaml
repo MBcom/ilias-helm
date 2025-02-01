@@ -193,7 +193,7 @@ iliasRPCServer:
   ilServerProperties: |-
     [Server]
     IpAddress = 0.0.0.0
-    Port = $ILSERVER_PORT
+    Port = {{ .Values.iliasRPCServer.port }}
     IndexPath = /var/lucenedata/ilias
     LogFile = /dev/stdout
     LogLevel = {{ .Values.iliasRPCServer.logLevel }}
