@@ -81,6 +81,9 @@ spec:
             - name: ilias-config
               mountPath: /setup.sh
               subPath: setup.sh
+            - name: ilias-secret
+              mountPath: /setup.json
+              subPath: setup.json
       containers:
         - name: ilias
           image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}
@@ -92,9 +95,9 @@ spec:
               - ALL
             privileged: false
             readOnlyRootFilesystem: false
-            runAsGroup: 1001
+            runAsGroup: 33
             runAsNonRoot: true
-            runAsUser: 1001
+            runAsUser: 33
             seLinuxOptions: {}
             seccompProfile:
               type: RuntimeDefault

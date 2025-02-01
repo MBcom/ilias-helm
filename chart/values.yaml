@@ -10,7 +10,7 @@ ilias:
   skipUpdate: 0 # Only for ILIAS < 6
   db:
     host: "" # Will be set by mariadb chart if left empty
-    user: root
+    user: ilias
     password: "" # Overridden by mariadb.auth.rootPassword if not empty
     name: ilias
     dump: setup/sql/ilias3.sql
@@ -19,7 +19,7 @@ ilias:
   timezone: Europe/Berlin
   maxUploadSize: 200M
   errorsPath: /var/iliasdata/ilias/errors
-  memoryLimit: 200M
+  memoryLimit: 4096M
   rootPassword: ""
   defaultSkin: default
   defaultStyle: delos
@@ -267,11 +267,6 @@ mariadb:
       ssl_ca={{ include "mariadb.tlsCACert" . }}
       {{- end }}
       {{- end }}
-      [client]
-      port=3306
-      socket=/opt/bitnami/mariadb/tmp/mysql.sock
-      default-character-set=UTF8
-      plugin_dir=/opt/bitnami/mariadb/plugin
 
       # ILIAS Options
       join_buffer_size=256M # Increased to 256M (adjust as needed)
@@ -282,6 +277,14 @@ mariadb:
       character-set-server=UTF8
       collation-server=utf8_general_ci
       max_allowed_packet=32M
+
+      [client]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mariadb/plugin
+
+      
 
       [manager]
       port=3306
