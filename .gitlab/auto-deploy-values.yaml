@@ -1,5 +1,6 @@
 ilias:
   clientName: "Relaxdays"
+  hostName: ilias.cluster01.service.cluster.relaxdays.on-rcs.com
 
 ingress:
   enabled: true

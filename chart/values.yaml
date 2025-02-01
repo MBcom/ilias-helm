@@ -2,7 +2,7 @@ ilias:
   image: srsolutions/ilias
   tag: 9-php8.2-apache # or specify a tag
   port: 80
-  autoSetup: 0
+  autoSetup: true
   autoUpdate: 0 # Same as autoSetup if ILIAS >= 7
   devMode: 0
   installArguments: ""
@@ -20,12 +20,142 @@ ilias:
   maxUploadSize: 200M
   errorsPath: /var/iliasdata/ilias/errors
   memoryLimit: 200M
-  rootPassword: "" # Will be generated if left empty or mariadb.auth.rootPassword is set
+  rootPassword: ""
   defaultSkin: default
   defaultStyle: delos
-  installConfigPath: /tmp/install.json # ILIAS >= 6
   sessionLifetime: 1800
   dumpAutoload: 0
+  phpConfig: |-
+    memory_limit = {{ .Values.ilias.memoryLimit }}
+    error_reporting = E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT
+    log_errors = On
+    max_execution_time = 900
+    max_input_time = 900
+    max_input_vars = 10000
+    upload_max_filesize = {{ .Values.ilias.maxUploadSize }}
+    post_max_size = {{ .Values.ilias.maxUploadSize }}
+    session.gc_maxlifetime = {{ .Values.ilias.sessionLifetime }}
+  clientIni: |-
+    ; <?php exit; ?>
+    [server]
+    start = ./login.php
+
+    [client]
+    name = {{ .Values.ilias.clientName }}
+    description = 
+    access = 1
+
+    [db]
+    type = innodb
+    host = {{ include "ilias.dbHost" . }}
+    user = {{ .Values.ilias.db.user | default .Values.mariadb.auth.username }}
+    pass = {{ .Values.ilias.db.password | default .Values.mariadb.auth.password }}
+    name = {{ .Values.ilias.db.name | default .Values.mariadb.auth.database | quote }}
+    port = 3306
+
+    [auth]
+    table = usr_data
+    usercol = login
+    passcol = passwd
+
+    [language]
+    default = en
+    path = ./lang
+
+    [layout]
+    skin = {{ .Values.ilias.defaultSkin }}
+    style = {{ .Values.ilias.defaultStyle }}
+
+    [session]
+    expire = {{ .Values.ilias.sessionLifetime }}
+
+    [system]
+    ROOT_FOLDER_ID = 1
+    SYSTEM_FOLDER_ID = 9
+    ROLE_FOLDER_ID = 8
+    MAIL_SETTINGS_ID = 12
+    MAXLENGTH_OBJ_TITLE = 65
+    MAXLENGTH_OBJ_DESC = 123
+    DEBUG = 0
+    DEVMODE = {{ .Values.ilias.devMode }}
+
+    [cache]
+    activate_global_cache = 0
+    global_cache_service_type = 0
+  setupJson: |-
+    {
+        "common" : {
+            "client_id" : "{{ .Values.ilias.clientName }}"
+        },
+        "database" : {
+            "type" : "innodb",
+            "host" : "{{ include "ilias.dbHost" . }}",
+            "database" : "{{ .Values.ilias.db.name | default .Values.mariadb.auth.database | quote }}",
+            "user" : "{{ .Values.ilias.db.user | default .Values.mariadb.auth.username }}",
+            "password" : "{{ .Values.ilias.db.password | default .Values.mariadb.auth.password }}",
+            "path_to_db_dump" : "setup/sql/ilias3.sql",
+            "port" : "3306",
+            "create_database": false
+        },
+        "filesystem" : {
+            "data_dir" : "/var/iliasdata/ilias"
+        },
+        "http" : {
+            "path" : "http://{{ .Values.ilias.hostName }}"
+        },
+        "systemfolder" : {
+            "contact" : {
+                "firstname" : "Systemadministrator",
+                "lastname" : "ILIAS",
+                "email" : "noreply@example.com"
+            }
+        },
+        "webservices" : {
+            "rpc_server_host" : "{{ .Release.Name }}-ilias",
+            "rpc_server_port" : "11111"
+        }
+    }
+  iliasIni: |-
+    ; <?php exit; ?>
+    [server]
+    http_path = http://{{ .Values.ilias.hostName }}
+    absolute_path = /var/www/html
+    presetting = 
+    timezone = {{ .Values.ilias.timezone }}
+
+    [clients]
+    path = data
+    inifile = client.ini.php
+    datadir = /var/iliasdata/ilias
+    default = {{ .Values.ilias.clientName }}
+    list = 0
+
+    [tools]
+    convert = /usr/bin/convert
+    zip = /usr/bin/zip
+    unzip = /usr/bin/unzip
+    java = 
+    htmldoc = 
+    ffmpeg = /usr/bin/ffmpeg
+    ghostscript = /usr/bin/gs
+    latex = 
+    phantomjs = /usr/local/bin/phantomjs
+    vscantype = 
+    scancommand = 
+    cleancommand = 
+
+    [log]
+    ; log to php://stdout (missing slash is added during concat by ilias itself)
+    path = php:/
+    file = stdout
+    enabled = 1
+    level = WARNING
+    error_path = {{ .Values.ilias.errorsPath }}
+
+    [https]
+    auto_https_detect_enabled = 1
+    auto_https_detect_header_name = X_FORWARDED_PROTO
+    auto_https_detect_header_value = https
   volumes:
     data: # PersistentVolumeClaim configuration for /var/www/html/data
       size: 4Gi

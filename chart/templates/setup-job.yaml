@@ -1,44 +1,34 @@
-apiVersion: apps/v1
-kind: Deployment
+{{- if .Values.ilias.autoSetup }}
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: {{ .Release.Name }}-ilias
+  name: "{{ .Release.Name }}-setup"
   labels:
-{{ include "ilias.labels" . | nindent 4 }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      ilias/server: "true"
-{{ include "ilias.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      name: "{{ .Release.Name }}-setup"
       labels:
-        ilias/server: "true"
-{{ include "ilias.labels" . | nindent 8 }}
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
+      restartPolicy: Never
       containers:
-        - name: ilias
-          image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}
-          command: ["apache2-foreground"]
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-              - ALL
-            sysctls:
-            - name: net.ipv4.ip_unprivileged_port_start
-              value: "0"
-            privileged: false
-            readOnlyRootFilesystem: true
-            runAsGroup: 1001
-            runAsNonRoot: true
-            runAsUser: 1001
-            seLinuxOptions: {}
-            seccompProfile:
-              type: RuntimeDefault
-          ports:
-            - containerPort: {{ .Values.ilias.port }}
-          env:
+      - name: post-install-job
+        image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}
+        command: ["/bin/sh", "/setup.sh"]
+        env:
             - name: ILIAS_AUTO_SETUP
               value: {{ .Values.ilias.autoSetup | quote }}
             - name: ILIAS_AUTO_UPDATE
@@ -95,40 +85,12 @@ spec:
               value: {{ .Values.ilias.sessionLifetime | quote }}
             - name: ILIAS_DUMP_AUTOLOAD
               value: {{ .Values.ilias.dumpAutoload | quote }}
-          volumeMounts:
-            - name: ilias-data
-              mountPath: /var/www/html/data
-            - name: ilias-iliasdata
-              mountPath: /var/iliasdata/ilias
-            - name: ilias-config
-              mountPath: /usr/local/etc/php/conf.d/ilias.ini
-              subPath: ilias.ini
-            - name: ilias-config
-              mountPath: /var/www/html/ilias.ini.php
-              subPath: ilias-config.php
-            - name: ilias-secret
-              mountPath: /var/www/html/data/{{ .Values.ilias.clientName }}/client.ini.php
-              subPath: ilias-client.php
-{{- if .Values.extraVolumeMounts }}
-{{- toYaml .Values.extraVolumeMounts | nindent 12 }}
-{{- end }}
-          resources: {{ .Values.ilias.resources | toYaml | nindent 12 }}
+        volumeMounts:
+          - name: setup
+            mountPath: /setup.sh
+            subPath: setup.sh
       volumes:
-        - name: ilias-data
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-ilias-data
-        - name: ilias-iliasdata
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-ilias-iliasdata
-        - name: ilias-config
+        - name: setup
           configMap:
             name: {{.Release.Name }}-ilias-config
-        - name: ilias-secret
-          secret:
-            secretName: {{.Release.Name }}-ilias-secrets
-            items:
-              - key: ilias-client.php
-                path: ilias-client.php
-{{- if .Values.extraVolumes }}
-{{- toYaml .Values.extraVolumes | nindent 8 }}
 {{- end }}
