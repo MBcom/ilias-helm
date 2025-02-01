@@ -1,0 +1,10 @@
+apiVersion: v2
+name: ilias
+description: A Helm chart for ILIAS LMS
+type: application
+version: 0.1.0
+appVersion: 9-php8.2-apache
+dependencies:
+  - name: mariadb
+    repository: https://charts.bitnami.com/bitnami
+    version: 20.2.2

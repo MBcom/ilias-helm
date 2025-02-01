@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{.Release.Name }}-ilias-data
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.ilias.volumes.iliasdata.size }}
+  {{- if .Values.ilias.volumes.data.storageClass }}
+  storageClassName: {{ .Values.ilias.volumes.data.storageClass }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{.Release.Name }}-ilias-iliasdata
+  labels:
+{{ include "ilias.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.ilias.volumes.iliasdata.size }}
+  {{- if .Values.ilias.volumes.iliasdata.storageClass }}
+  storageClassName: {{ .Values.ilias.volumes.iliasdata.storageClass }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{.Release.Name }}-ilias-lucene
+  labels:
+{{ include "ilias.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.iliasRPCServer.volumes.lucene.size | quote }}
+  {{- if .Values.iliasRPCServer.volumes.lucene.storageClass }}
+  storageClassName: {{ .Values.iliasRPCServer.volumes.lucene.storageClass }}
+  {{- end }}

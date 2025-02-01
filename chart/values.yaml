@@ -1,0 +1,140 @@
+ilias:
+  image: srsolutions/ilias
+  tag: 9-php8.2-apache # or specify a tag
+  port: 80
+  autoSetup: 0
+  autoUpdate: 0 # Same as autoSetup if ILIAS >= 7
+  devMode: 0
+  installArguments: ""
+  updateArguments: "" # Same as installArguments if ILIAS >= 7
+  skipUpdate: 0 # Only for ILIAS < 6
+  db:
+    host: "" # Will be set by mariadb chart if left empty
+    user: root
+    password: "" # Overridden by mariadb.auth.rootPassword if not empty
+    name: ilias
+    dump: setup/sql/ilias3.sql
+  clientName: default
+  hostName: "" # Defaults to the pod's hostname
+  timezone: Europe/Berlin
+  maxUploadSize: 200M
+  errorsPath: /var/iliasdata/ilias/errors
+  memoryLimit: 200M
+  rootPassword: "" # Will be generated if left empty or mariadb.auth.rootPassword is set
+  defaultSkin: default
+  defaultStyle: delos
+  installConfigPath: /tmp/install.json # ILIAS >= 6
+  sessionLifetime: 1800
+  dumpAutoload: 0
+  volumes:
+    data: # PersistentVolumeClaim configuration for /var/www/html/data
+      size: 4Gi
+      # storageClass: ""
+    iliasdata: # PersistentVolumeClaim configuration for /var/iliasdata/ilias
+      size: 4Gi
+      # storageClass: ""
+  resources:  # Resource requests and limits for the ilias pod.
+    requests:
+      cpu: 200m
+      memory: 4G
+    limits:
+      cpu: 3
+      memory: 6G
+
+iliasRPCServer:
+  image: srsolutions/ilias-ilserver
+  tag: 9-openjdk17-jre
+  nicId: 0
+  logLevel: "INFO"
+  threads: 1
+  ramBufferSize: 256
+  maxFileSize: 500
+  port: 11111
+  volumes:
+    lucene:
+      size: 4Gi
+      # storageClass: ""
+
+extraVolumes: []
+      # - name: my-volume
+      #   mountPath: /path/in/container
+      #   readOnly: false # Optional
+
+extraVolumeMounts: []
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx" # Or your ingress controller class
+    # Add other annotations as needed
+  hosts:
+    - host: ilias.example.com # Replace with your domain
+      paths:
+        - path: /
+          pathType: Prefix # Or ImplementationSpecific, Exact
+  tls:
+    - secretName: ilias-tls # Create this secret with your certificate
+      hosts:
+        - ilias.example.com # Must match the host above
+
+mariadb:
+  auth:
+    username: ilias
+    password: "" # If empty, a password will be generated. Overrides ilias.db.password if set.
+    database: ilias
+  persistence: # Enable persistence for MariaDB data
+    enabled: true
+    size: 10Gi
+  primary: # Add this section for custom my.cnf configuration
+    configuration: |-
+      [mysqld]
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mariadb
+      datadir=/bitnami/mariadb/data
+      plugin_dir=/opt/bitnami/mariadb/plugin
+      port={{ .Values.primary.containerPorts.mysql }}
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      tmpdir=/opt/bitnami/mariadb/tmp
+      bind-address=*
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+      log-error=/opt/bitnami/mariadb/logs/mysqld.log
+      
+      slow_query_log=0
+      long_query_time=10.0
+      binlog_expire_logs_seconds=2592000
+      {{- if .Values.tls.enabled }}
+      ssl_cert=/opt/bitnami/mariadb/certs/{{ .Values.tls.certFilename }}
+      ssl_key=/opt/bitnami/mariadb/certs/{{ .Values.tls.certKeyFilename }}
+      {{- if (include "mariadb.tlsCACert" .) }}
+      ssl_ca={{ include "mariadb.tlsCACert" . }}
+      {{- end }}
+      {{- end }}
+      [client]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mariadb/plugin
+
+      # ILIAS Options
+      join_buffer_size=256M # Increased to 256M (adjust as needed)
+      table_open_cache=500   # Increased to 500 (adjust as needed)
+      innodb_buffer_pool_size=2G # Set to 2G (adjust as needed)
+      innodb_large_prefix=OFF # Important for ROW_FORMAT COMPACT
+      sql_mode="" # Disables strict mode (important for MySQL 5.7+ and Galera)
+      character-set-server=UTF8
+      collation-server=utf8_general_ci
+      max_allowed_packet=32M
+
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+      # other custom my.cnf settings as needed
+  # other mariadb values as needed
+
+cronjob:
+  enabled: true
+  image: srsolutions/ilias
+  tag: latest # or specify a tag
+  schedule: "0 2 * * *" # Daily at 2 AM

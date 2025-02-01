@@ -1,0 +1,20 @@
+ilias:
+  clientName: "Relaxdays"
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx" # Or your ingress controller class
+    "cert-manager.io/cluster-issuer": "on-rcs-issuer"
+    "cert-manager.io/private-key-size": "4096"
+    "acme.cert-manager.io/ignore-dns-names-with-missing-solver": "true"
+    # Add other annotations as needed
+  hosts:
+    - host: ilias.cluster01.service.cluster.relaxdays.on-rcs.com # Replace with your domain
+      paths:
+        - path: /
+          pathType: Prefix # Or ImplementationSpecific, Exact
+  tls:
+    - secretName: ilias-tls # Create this secret with your certificate
+      hosts:
+        - ilias.cluster01.service.cluster.relaxdays.on-rcs.com # Must match the host above

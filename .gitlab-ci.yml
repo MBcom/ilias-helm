@@ -1,0 +1,12 @@
+include:
+ - project: 'templates_gitlab/app_deployment_template'
+   ref: master
+   file: '/auto-devops.template.yaml'
+
+variables:
+  BUILD_DISABLED: "true"
+  HELM_DEPLOY_ENABLED: "true"
+  SKIP_TEST_COVERAGE: "true"
+  SKIP_TEST_FORMAT: "true"
+  SKIP_TEST_LINT: "true"
+  SKIP_DOCS: "true"
