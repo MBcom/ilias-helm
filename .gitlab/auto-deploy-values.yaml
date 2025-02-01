@@ -3,9 +3,9 @@ ilias:
   hostName: ilias.cluster01.service.cluster.relaxdays.on-rcs.com
   volumes:
     data:
-      storageClass: "openebs-rwx"
+      storageClass: "on-rcs-rwx"
     iliasdata:
-      storageClass: "openebs-rwx"
+      storageClass: "on-rcs-rwx"
 
 ingress:
   enabled: true
