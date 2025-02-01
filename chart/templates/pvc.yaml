@@ -4,10 +4,10 @@ metadata:
   name: {{.Release.Name }}-ilias-data
 spec:
   accessModes:
-    - ReadWriteMany
+    - {{ .Values.ilias.volumes.data.accessMode }}
   resources:
     requests:
-      storage: {{ .Values.ilias.volumes.iliasdata.size }}
+      storage: {{ .Values.ilias.volumes.data.size }}
   {{- if .Values.ilias.volumes.data.storageClass }}
   storageClassName: {{ .Values.ilias.volumes.data.storageClass }}
   {{- end }}
@@ -21,7 +21,7 @@ metadata:
 {{ include "ilias.labels" . | nindent 4 }}
 spec:
   accessModes:
-    - ReadWriteMany
+    - {{ .Values.ilias.volumes.iliasdata.accessMode }}
   resources:
     requests:
       storage: {{ .Values.ilias.volumes.iliasdata.size }}
@@ -38,7 +38,7 @@ metadata:
 {{ include "ilias.labels" . | nindent 4 }}
 spec:
   accessModes:
-    - ReadWriteMany
+    - {{ .Values.iliasRPCServer.volumes.lucene.accessMode }}
   resources:
     requests:
       storage: {{ .Values.iliasRPCServer.volumes.lucene.size | quote }}

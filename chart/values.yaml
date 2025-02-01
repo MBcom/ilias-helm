@@ -29,9 +29,11 @@ ilias:
   volumes:
     data: # PersistentVolumeClaim configuration for /var/www/html/data
       size: 4Gi
+      accessMode: ReadWriteOnce
       # storageClass: ""
     iliasdata: # PersistentVolumeClaim configuration for /var/iliasdata/ilias
       size: 4Gi
+      accessMode: ReadWriteOnce
       # storageClass: ""
   resources:  # Resource requests and limits for the ilias pod.
     requests:
@@ -53,6 +55,7 @@ iliasRPCServer:
   volumes:
     lucene:
       size: 4Gi
+      accessMode: ReadWriteOnce
       # storageClass: ""
 
 extraVolumes: []
