@@ -8,6 +8,11 @@ data:
   ilias-config.php: |-
     {{- include "common.tplvalues.render" ( dict "value" .Values.ilias.iliasIni "context" $ ) | nindent 4 }}
   setup.sh: |-
+    mkdir -p /var/www/html/data/{{ .Values.ilias.clientName }} || true
+    cp /client.ini.php /var/www/html/data/{{ .Values.ilias.clientName }}/client.ini.php
+    chown -R www-data:www-data /var/www/html/data/ 
+    chown -R www-data:www-data /var/iliasdata/ilias/ 
+    
     mysql="mysql
             --host=${ILIAS_DB_HOST}
             --port=${ILIAS_DB_PORT}

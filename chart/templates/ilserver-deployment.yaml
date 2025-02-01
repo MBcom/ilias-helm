@@ -61,9 +61,6 @@ spec:
             - name: ilias-il-config
               mountPath: /app/ilias.ini.php
               subPath: ilias.ini.php
-            - name: ilias-secret
-              mountPath: /var/www/html/data/{{ .Values.ilias.clientName }}/client.ini.php
-              subPath: ilias-client.php
 {{- if .Values.extraVolumeMounts }}
 {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
 {{- end }}

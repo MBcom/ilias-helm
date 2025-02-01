@@ -90,7 +90,7 @@ ilias:
         "database" : {
             "type" : "innodb",
             "host" : "{{ include "ilias.dbHost" . }}",
-            "database" : "{{ .Values.ilias.db.name | default .Values.mariadb.auth.database | quote }}",
+            "database" : "{{ .Values.ilias.db.name | default .Values.mariadb.auth.database }}",
             "user" : "{{ .Values.ilias.db.user | default .Values.mariadb.auth.username }}",
             "password" : "{{ .Values.ilias.db.password | default .Values.mariadb.auth.password }}",
             "path_to_db_dump" : "setup/sql/ilias3.sql",

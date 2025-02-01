@@ -84,6 +84,13 @@ spec:
             - name: ilias-secret
               mountPath: /setup.json
               subPath: setup.json
+            - name: ilias-secret
+              mountPath: /client.ini.php
+              subPath: ilias-client.php
+            - name: ilias-data
+              mountPath: /var/www/html/data
+            - name: ilias-iliasdata
+              mountPath: /var/iliasdata/ilias
       containers:
         - name: ilias
           image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}
@@ -170,10 +177,7 @@ spec:
               subPath: ilias.ini
             - name: ilias-config
               mountPath: /var/www/html/ilias.ini.php
-              subPath: ilias-config.php
-            - name: ilias-secret
-              mountPath: /var/www/html/data/{{ .Values.ilias.clientName }}/client.ini.php
-              subPath: ilias-client.php
+              subPath: ilias-config.php  
 {{- if .Values.extraVolumeMounts }}
 {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
 {{- end }}
@@ -198,6 +202,8 @@ spec:
             items:
               - key: ilias-client.php
                 path: ilias-client.php
+              - key: setup.json
+                path: setup.json
 {{- if .Values.extraVolumes }}
 {{- toYaml .Values.extraVolumes | nindent 8 }}
 {{- end }}
