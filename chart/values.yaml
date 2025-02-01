@@ -159,11 +159,11 @@ ilias:
   volumes:
     data: # PersistentVolumeClaim configuration for /var/www/html/data
       size: 4Gi
-      accessMode: ReadWriteOnce
+      accessMode: ReadWriteMany
       # storageClass: ""
     iliasdata: # PersistentVolumeClaim configuration for /var/iliasdata/ilias
       size: 4Gi
-      accessMode: ReadWriteOnce
+      accessMode: ReadWriteMany
       # storageClass: ""
   resources:  # Resource requests and limits for the ilias pod.
     requests:
