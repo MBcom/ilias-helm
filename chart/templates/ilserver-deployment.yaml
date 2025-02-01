@@ -19,6 +19,7 @@ spec:
       containers:
         - name: ilias
           image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}
+          command: ["java", "-jar", "ilServer.jar", "ilServer.properties", "start"]
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -35,31 +36,6 @@ spec:
           ports:
             - containerPort: {{ .Values.ilias.port }}
           env:
-            - name: ILIAS_AUTO_SETUP
-              value: {{ .Values.ilias.autoSetup | quote }}
-            - name: ILIAS_AUTO_UPDATE
-              value: {{ .Values.ilias.autoUpdate | quote }}
-            - name: ILIAS_DEVMODE
-              value: {{ .Values.ilias.devMode | quote }}
-            - name: ILIAS_INSTALL_ARGUMENTS
-              value: {{ .Values.ilias.installArguments | quote }}
-            - name: ILIAS_UPDATE_ARGUMENTS
-              value: {{ .Values.ilias.updateArguments | quote }}
-            - name: ILIAS_SKIP_UPDATE
-              value: {{ .Values.ilias.skipUpdate | quote }}
-            - name: ILIAS_DB_HOST
-              value: {{ include "ilias.dbHost" . | quote }}
-            - name: ILIAS_DB_USER
-              value: {{ .Values.ilias.db.user | default .Values.mariadb.auth.username | quote }}
-            - name: ILIAS_DB_PASSWORD
-            {{- if .Values.ilias.db.password }}
-              value: {{ .Values.ilias.db.password | quote }}
-            {{- else }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-mariadb
-                  key: mariadb-password
-            {{- end }}
             - name: ILSERVER_LOGLEVEL
               value: {{ .Values.iliasRPCServer.logLevel | quote }}
             - name: ILSERVER_NIC_ID
@@ -72,25 +48,6 @@ spec:
               value: {{ .Values.iliasRPCServer.ramBufferSize | quote }}
             - name: ILSERVER_MAX_FILESIZE
               value: {{ .Values.iliasRPCServer.maxFileSize | quote }}
-            - name: ILIAS_ERRORS_PATH
-              value: {{ .Values.ilias.errorsPath | quote }}
-            - name: ILIAS_MEMORY_LIMIT
-              value: {{ .Values.ilias.memoryLimit | quote }}
-            - name: ILIAS_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-ilias-secrets
-                  key: ilias-root-password
-            - name: ILIAS_DEFAULT_SKIN
-              value: {{ .Values.ilias.defaultSkin | quote }}
-            - name: ILIAS_DEFAULT_STYLE
-              value: {{ .Values.ilias.defaultStyle | quote }}
-            - name: ILIAS_INSTALL_CONFIG_PATH
-              value: {{ .Values.ilias.installConfigPath | quote }}
-            - name: ILIAS_SESSION_LIFETIME
-              value: {{ .Values.ilias.sessionLifetime | quote }}
-            - name: ILIAS_DUMP_AUTOLOAD
-              value: {{ .Values.ilias.dumpAutoload | quote }}
           volumeMounts:
             - name: ilias-data
               mountPath: /app/data
@@ -98,6 +55,12 @@ spec:
               mountPath: /app/iliasdata
             - name: ilias-lucence
               mountPath: /var/lucenedata/ilias
+            - name: ilias-il-config
+              mountPath: /app/ilServer.properties
+              subPath: ilServer.properties
+            - name: ilias-il-config
+              mountPath: /app/ilias.ini.php
+              subPath: ilias.ini.php
 {{- if .Values.extraVolumeMounts }}
 {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
 {{- end }}
@@ -112,6 +75,9 @@ spec:
         - name: ilias-lucence
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-ilias-lucene
+        - name: ilias-il-config
+          configMap:
+            name: {{.Release.Name }}-ilias-rpc-config
 {{- if .Values.extraVolumes }}
 {{- toYaml .Values.extraVolumes | nindent 8 }}
 {{- end }}

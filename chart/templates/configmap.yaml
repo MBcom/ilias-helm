@@ -61,4 +61,14 @@ data:
             su www-data -s /bin/sh -c "php setup/cli.php update -y ${ILIAS_UPDATE_ARGUMENTS}"
         fi
     fi
-  
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{.Release.Name }}-ilias-rpc-config
+data:
+  ilias.ini.php: |-
+    {{- include "common.tplvalues.render" ( dict "value" .Values.iliasRPCServer.iliasIni "context" $ ) | nindent 4 }}
+  ilServer.properties: |-
+    {{- include "common.tplvalues.render" ( dict "value" .Values.iliasRPCServer.ilServerProperties "context" $ ) | nindent 4 }}

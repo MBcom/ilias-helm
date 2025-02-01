@@ -182,6 +182,29 @@ iliasRPCServer:
   ramBufferSize: 256
   maxFileSize: 500
   port: 11111
+  iliasIni: |-
+    [server]
+    absolute_path = /app/
+
+    [clients]
+    inifile = client.ini.php
+    path = data
+    datadir = iliasdata
+  ilServerProperties: |-
+    [Server]
+    IpAddress = 0.0.0.0
+    Port = $ILSERVER_PORT
+    IndexPath = /var/lucenedata/ilias
+    LogFile = /dev/stdout
+    LogLevel = {{ .Values.iliasRPCServer.logLevel }}
+    NumThreads = {{ .Values.iliasRPCServer.threads }}
+    RamBufferSize = {{ .Values.iliasRPCServer.ramBufferSize }}
+    IndexMaxFileSizeMB = {{ .Values.iliasRPCServer.maxFileSize }}
+
+    [Client1]
+    ClientId = {{ .Values.ilias.clientName }}
+    NicId = {{ .Values.iliasRPCServer.nicId }}
+    IliasIniPath = /app/ilias.ini.php
   volumes:
     lucene:
       size: 4Gi
