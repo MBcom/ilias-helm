@@ -10,4 +10,4 @@ variables:
   SKIP_TEST_FORMAT: "true"
   SKIP_TEST_LINT: "true"
   SKIP_DOCS: "true"
-  ADDITIONAL_HELM_UPGRADE_BUILD_ARGS: "--set mariadb.auth.password=$MARIADB_PASSWORD --set ilias.rootPassword=$ILIAS_ROOT_PASSWORD"
+  ADDITIONAL_HELM_UPGRADE_BUILD_ARGS: "--set mariadb.auth.password=$MARIADB_PASSWORD --set ilias.rootPassword=$ILIAS_ROOT_PASSWORD --set mariadb.auth.rootPassword=$MARIADB_ROOT_PASSWORD"

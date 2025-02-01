@@ -30,23 +30,27 @@ data:
         echo "Cannot connect to database, waiting"
         sleep 10
     done
-    echo "Database connection established
+    echo "Database connection established"
+
     if ! $(${mysql} -e "SELECT COUNT(*) FROM settings" &> /dev/null); then
         # Run setup
         echo "Running setup"
         su www-data -s /bin/sh -c "php setup/cli.php install -y \
-            ${ILIAS_INSTALL_ARGUMENTS} ${ILIAS_INSTALL_CONFIG_PATH}
+            ${ILIAS_INSTALL_ARGUMENTS} ${ILIAS_INSTALL_CONFIG_PATH}"
+
         # Customize ilias
         echo "Setting root password"
         ${mysql} -e "UPDATE usr_data SET
                 passwd = '$(mkpass ${ILIAS_ROOT_PASSWORD})',
                 passwd_enc_type = 'md5'
-            WHERE usr_id = 6
+            WHERE usr_id = 6"
+
         echo "Setting skin/style"
         ${mysql} -e "UPDATE usr_pref SET value = '${ILIAS_DEFAULT_SKIN}'
             WHERE keyword = 'skin'"
         ${mysql} -e "UPDATE usr_pref SET value = '${ILIAS_DEFAULT_STYLE}'
-            WHERE keyword = 'style'
+            WHERE keyword = 'style'"
+            
         echo "======================================================="
         echo "ILIAS installed successfully!"
         echo "Log in using the following credentials:"
@@ -55,7 +59,8 @@ data:
         echo "Password:       ${ILIAS_ROOT_PASSWORD}"
         echo "======================================================="
     else
-        echo "ILIAS already installed
+        echo "ILIAS already installed"
+        
         if [ "${ILIAS_AUTO_UPDATE}" -eq "1" ]; then
             echo "Update requested, running setup"
             su www-data -s /bin/sh -c "php setup/cli.php update -y ${ILIAS_UPDATE_ARGUMENTS}"

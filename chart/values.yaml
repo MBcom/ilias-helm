@@ -237,6 +237,7 @@ mariadb:
   auth:
     username: ilias
     password: "" # If empty, a password will be generated. Overrides ilias.db.password if set.
+    rootPassword: "" # If empty, a password will be generated. Overrides ilias.db.password if set.
     database: ilias
   persistence: # Enable persistence for MariaDB data
     enabled: true
