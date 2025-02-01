@@ -25,9 +25,6 @@ spec:
             capabilities:
               drop:
               - ALL
-            sysctls:
-            - name: net.ipv4.ip_unprivileged_port_start
-              value: "0"
             privileged: false
             readOnlyRootFilesystem: true
             runAsGroup: 1001
@@ -113,6 +110,10 @@ spec:
 {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
 {{- end }}
           resources: {{ .Values.ilias.resources | toYaml | nindent 12 }}
+      securityContext:
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "0"
       volumes:
         - name: ilias-data
           persistentVolumeClaim:
