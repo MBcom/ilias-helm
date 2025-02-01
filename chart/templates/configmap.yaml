@@ -35,7 +35,7 @@ data:
         if [ $? -ne 0 ]; then
             # Run setup
             echo "Running setup"
-            /bin/sh -c "php setup/cli.php install -y \
+            su www-data -s /bin/sh -c "php setup/cli.php install -y \
                 ${ILIAS_INSTALL_ARGUMENTS} /setup.json"
 
             # Customize ilias
