@@ -19,7 +19,7 @@ spec:
       containers:
         - name: ilias
           image: {{ .Values.iliasRPCServer.image }}:{{ .Values.iliasRPCServer.tag }}
-          command: ["java", "-jar", "ilServer.jar", "ilServer.properties", "start"]
+          command: ["/bin/bash", "-c", "java -jar /app/ilServer.jar /app/ilServer.properties start"]
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
