@@ -10,6 +10,7 @@ spec:
     spec:
       template:
         spec:
+          restartPolicy: Never
           containers:
             - name: ilias-cronjob
               image: {{ .Values.cronjob.image }}:{{ .Values.cronjob.tag }}
