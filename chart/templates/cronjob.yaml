@@ -14,14 +14,17 @@ spec:
           containers:
             - name: ilias-cronjob
               image: {{ .Values.cronjob.image }}:{{ .Values.cronjob.tag }}
-              command: ["/bin/sh", "-c", '"/usr/local/bin/php ${ILIAS_WWW_PATH}/cron/cron.php run-jobs root ${ILIAS_CLIENT_NAME}"']
+              command: ["/bin/sh", "-c", "/usr/local/bin/php ${ILIAS_WWW_PATH}/cron/cron.php run-jobs root ${ILIAS_CLIENT_NAME}"]
+              env:
+                - name: ILIAS_CLIENT_NAME
+                  value: {{ .Values.ilias.clientName | quote }}
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop:
                   - ALL
                 privileged: false
-                readOnlyRootFilesystem: true
+                readOnlyRootFilesystem: false
                 runAsGroup: 33
                 runAsNonRoot: true
                 runAsUser: 33

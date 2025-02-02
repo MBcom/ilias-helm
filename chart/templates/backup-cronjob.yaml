@@ -16,7 +16,7 @@ spec:
                 - /bin/sh
                 - -c
                 - |-
-                  set -ex
+                  set -e
 
                   # Get MariaDB credentials and connection details from the subchart
                   MARIADB_HOST={{ include "ilias.dbHost" . | quote }}
@@ -38,7 +38,20 @@ spec:
               volumeMounts:
                 - name: backup-volume
                   mountPath: /backups
-
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                privileged: false
+                readOnlyRootFilesystem: true
+                runAsGroup: 1001
+                runAsNonRoot: true
+                runAsUser: 1001
+                fsGroup: 1001
+                seLinuxOptions: {}
+                seccompProfile:
+                  type: RuntimeDefault
           volumes:
             - name: backup-volume
               persistentVolumeClaim:
