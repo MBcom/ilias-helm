@@ -91,6 +91,9 @@ spec:
               mountPath: /var/www/html/data
             - name: ilias-iliasdata
               mountPath: /var/iliasdata/ilias
+            - name: ilias-config
+              mountPath: /usr/local/etc/php/conf.d/ilias.ini
+              subPath: ilias.ini
       containers:
         - name: ilias
           image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}

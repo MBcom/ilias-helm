@@ -111,8 +111,8 @@ ilias:
             }
         },
         "webservices" : {
-            "rpc_server_host" : "{{ .Release.Name }}-ilias",
-            "rpc_server_port" : "11111"
+            "rpc_server_host" : "{{ .Release.Name }}-ilias-rpc",
+            "rpc_server_port" : "{{ .Values.iliasRPCServer.port }}"
         }
     }
   iliasIni: |-
@@ -184,7 +184,7 @@ iliasRPCServer:
   port: 11111
   iliasIni: |-
     [server]
-    absolute_path = /app/
+    absolute_path = /var/www/html/
 
     [clients]
     inifile = client.ini.php
@@ -293,8 +293,15 @@ mariadb:
       # other custom my.cnf settings as needed
   # other mariadb values as needed
 
+mariadbBackup:
+  enabled: true
+  schedule: "0 3 * * *" # 3:00 AM daily
+  volume:
+    size: 4Gi
+    # storageClass: ""
+
 cronjob:
   enabled: true
   image: srsolutions/ilias
-  tag: latest # or specify a tag
+  tag: 9-php8.2-apache # or specify a tag
   schedule: "0 2 * * *" # Daily at 2 AM

@@ -35,7 +35,7 @@ data:
         done
         echo "Database connection established"
 
-        ${mysql} -e "SELECT COUNT(*) FROM settings" &> /dev/null
+        ${mysql} -e "SELECT COUNT(*) FROM settings"
 
         if [ $? -ne 0 ]; then
             # Run setup
@@ -46,7 +46,7 @@ data:
             # Customize ilias
             echo "Setting root password"
             ${mysql} -e "UPDATE usr_data SET
-                    passwd = '$(mkpass ${ILIAS_ROOT_PASSWORD})',
+                    passwd = '$(echo -n ${ILIAS_ROOT_PASSWORD} | md5sum | awk '{print $1}')',
                     passwd_enc_type = 'md5'
                 WHERE usr_id = 6"
 
