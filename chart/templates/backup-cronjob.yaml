@@ -9,6 +9,8 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            fsGroup: 1001
           containers:
             - name: mariadb-backup
               image: {{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
@@ -48,7 +50,6 @@ spec:
                 runAsGroup: 1001
                 runAsNonRoot: true
                 runAsUser: 1001
-                fsGroup: 1001
                 seLinuxOptions: {}
                 seccompProfile:
                   type: RuntimeDefault
