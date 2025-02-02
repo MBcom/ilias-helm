@@ -37,6 +37,10 @@ spec:
                   # Cleanup old backups (older than 10 days)
                   find /backups/ -name "${DATABASE_NAME}-*.sql.gz" -mtime +10 -exec rm {} \;
 
+                  echo "Backups in store:"
+                  ls -lah /backups/
+                  echo "Finished backup successfully."
+
               volumeMounts:
                 - name: backup-volume
                   mountPath: /backups
