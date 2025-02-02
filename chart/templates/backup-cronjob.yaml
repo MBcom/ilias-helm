@@ -1,0 +1,48 @@
+{{- if .Values.mariadbBackup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{.Release.Name }}-mariadb-backup
+spec:
+  schedule: {{ .Values.mariadbBackup.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mariadb-backup
+              image: {{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+              command:
+                - /bin/sh
+                - -c
+                - |-
+                  set -ex
+
+                  # Get MariaDB credentials and connection details from the subchart
+                  MARIADB_HOST={{ include "ilias.dbHost" . | quote }}
+                  MARIADB_PORT=3306
+                  MARIADB_USER={{ .Values.ilias.db.user | default .Values.mariadb.auth.username | quote }}
+                  MARIADB_PASSWORD={{ .Values.ilias.db.password | default .Values.mariadb.auth.password | quote }}
+                  DATABASE_NAME={{ .Values.ilias.db.name | default .Values.mariadb.auth.database | quote }}
+
+                  # Generate timestamped filename
+                  TIMESTAMP=$(date +%Y%m%d)
+                  BACKUP_FILE="/backups/${DATABASE_NAME}-${TIMESTAMP}.sql.gz"
+
+                  # Perform the backup
+                  mysqldump -h "${MARIADB_HOST}" -P "${MARIADB_PORT}" -u "${MARIADB_USER}" -p"${MARIADB_PASSWORD}" "${DATABASE_NAME}" | gzip --rsyncable > "${BACKUP_FILE}"
+
+                  # Cleanup old backups (older than 10 days)
+                  find /backups/ -name "${DATABASE_NAME}-*.sql.gz" -mtime +10 -exec rm {} \;
+
+              volumeMounts:
+                - name: backup-volume
+                  mountPath: /backups
+
+          volumes:
+            - name: backup-volume
+              persistentVolumeClaim:
+                claimName: {{.Release.Name }}-mariadb-backup-pvc
+
+          restartPolicy: OnFailure
+{{- end }}

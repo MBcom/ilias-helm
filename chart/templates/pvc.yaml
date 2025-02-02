@@ -45,3 +45,18 @@ spec:
   {{- if .Values.iliasRPCServer.volumes.lucene.storageClass }}
   storageClassName: {{ .Values.iliasRPCServer.volumes.lucene.storageClass }}
   {{- end }}
+---
+{{- if .Values.mariadbBackup.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{.Release.Name }}-mariadb-backup-pvc
+spec:
+  accessModes: [ "ReadWriteOnce" ] 
+  resources:
+    requests:
+      storage: {{ .Values.mariadbBackup.volume.size | quote }}
+  {{- if .Values.mariadbBackup.volume.storageClass }}
+  storageClassName: {{ .Values.mariadbBackup.volume.storageClass }}
+  {{- end }}
+{{- end }}
