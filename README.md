@@ -1,93 +1,125 @@
-# Ilias-Helm
+# ILIAS Helm Chart
 
+This Helm chart deploys the ILIAS e-learning platform on a Kubernetes cluster. It supports deploying ILIAS with either a single MariaDB instance or a Galera cluster for high availability.  It also includes deployment of the ILIAS RPC server, automatic database backups, and ILIAS cron jobs.
 
+## Prerequisites
 
-## Getting started
+- Kubernetes cluster
+- Helm 3
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Installing the Chart
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+1. Add the repository (if you haven't already):
 
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.relaxdays.de/systemintegration/ilias-helm.git
-git branch -M main
-git push -uf origin main
+```bash
+helm repo add ilias https://<your-repo-url> # Replace with your repo URL
+helm repo update
 ```
 
-## Integrate with your tools
+2. Install the chart:
 
-- [ ] [Set up project integrations](https://gitlab.relaxdays.de/systemintegration/ilias-helm/-/settings/integrations)
+```bash
+helm install ilias ilias/ilias -n <your-namespace> # Replace with your release name and namespace
+```
 
-## Collaborate with your team
+## Uninstalling the Chart
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```bash
+helm uninstall ilias -n <your-namespace> # Replace with your release name and namespace
+```
 
-## Test and Deploy
+## Configuration
 
-Use the built-in continuous integration in GitLab.
+The following table describes the configurable parameters in the `values.yaml` file:
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+| Parameter | Description | Default |
+|---|---|---|
+| `ilias.image` | ILIAS Docker image name | `srsolutions/ilias` |
+| `ilias.tag` | ILIAS Docker image tag | `9-php8.2-apache` |
+| `ilias.port` | ILIAS service port | `80` |
+| `ilias.autoSetup` | Automatically run ILIAS setup | `true` |
+| `ilias.autoUpdate` | Automatically run ILIAS update (ILIAS >= 7) | `0` |
+| `ilias.devMode` | Enable ILIAS development mode | `0` |
+| `ilias.installArguments` | Arguments for ILIAS installation | `""` |
+| `ilias.updateArguments` | Arguments for ILIAS update (ILIAS >= 7) | `""` |
+| `ilias.skipUpdate` | Skip ILIAS update (ILIAS < 6) | `0` |
+| `ilias.db.host` | MariaDB host. If empty, it will be set by the MariaDB chart. | `""` |
+| `ilias.db.user` | ILIAS database user | `ilias` |
+| `ilias.db.password` | ILIAS database password. Overridden by `mariadb.auth.rootPassword` if set. | `""` |
+| `ilias.db.name` | ILIAS database name | `ilias` |
+| `ilias.db.dump` | Path to the ILIAS database dump file | `setup/sql/ilias3.sql` |
+| `ilias.clientName` | ILIAS client name | `default` |
+| `ilias.hostName` | ILIAS host name. Defaults to the pod's hostname. | `""` |
+| `ilias.timezone` | ILIAS timezone | `Europe/Berlin` |
+| `ilias.maxUploadSize` | Maximum file upload size | `200M` |
+| `ilias.errorsPath` | Path to ILIAS error logs | `/var/iliasdata/ilias/errors` |
+| `ilias.memoryLimit` | PHP memory limit | `4096M` |
+| `ilias.rootPassword` | ILIAS root password | `""` |
+| `ilias.defaultSkin` | Default ILIAS skin | `default` |
+| `ilias.defaultStyle` | Default ILIAS style | `delos` |
+| `ilias.sessionLifetime` | ILIAS session lifetime (in seconds) | `1800` |
+| `ilias.dumpAutoload` | Whether to dump autoload files | `0` |
+| `ilias.phpConfig` | Custom PHP configuration | See `values.yaml` |
+| `ilias.clientIni` | Custom ILIAS client INI configuration | See `values.yaml` |
+| `ilias.setupJson` | Custom ILIAS setup JSON configuration | See `values.yaml` |
+| `ilias.iliasIni` | Custom ILIAS INI configuration | See `values.yaml` |
+| `ilias.volumes.data.size` | Size of the persistent volume for ILIAS data | `4Gi` |
+| `ilias.volumes.data.accessMode` | Access mode for the ILIAS data persistent volume | `ReadWriteMany` |
+| `ilias.volumes.iliasdata.size` | Size of the persistent volume for ILIAS data directory | `4Gi` |
+| `ilias.volumes.iliasdata.accessMode` | Access mode for the ILIAS data directory persistent volume | `ReadWriteMany` |
+| `ilias.resources.requests.cpu` | CPU requests for the ILIAS pod | `200m` |
+| `ilias.resources.requests.memory` | Memory requests for the ILIAS pod | `4G` |
+| `ilias.resources.limits.cpu` | CPU limits for the ILIAS pod | `3` |
+| `ilias.resources.limits.memory` | Memory limits for the ILIAS pod | `6G` |
+| `iliasRPCServer.image` | ILIAS RPC server Docker image | `srsolutions/ilias-ilserver` |
+| `iliasRPCServer.tag` | ILIAS RPC server Docker image tag | `9-openjdk17-jre` |
+| `iliasRPCServer.nicId` | ILIAS RPC server NIC ID | `0` |
+| `iliasRPCServer.logLevel` | ILIAS RPC server log level | `INFO` |
+| `iliasRPCServer.threads` | ILIAS RPC server number of threads | `1` |
+| `iliasRPCServer.ramBufferSize` | ILIAS RPC server RAM buffer size | `256` |
+| `iliasRPCServer.maxFileSize` | ILIAS RPC server maximum file size | `500` |
+| `iliasRPCServer.port` | ILIAS RPC server port | `11111` |
+| `iliasRPCServer.iliasIni` | ILIAS RPC server ILIAS INI configuration | See `values.yaml` |
+| `iliasRPCServer.ilServerProperties` | ILIAS RPC server properties configuration | See `values.yaml` |
+| `iliasRPCServer.volumes.lucene.size` | Size of the persistent volume for ILIAS RPC server Lucene data | `4Gi` |
+| `iliasRPCServer.volumes.lucene.accessMode` | Access mode for the ILIAS RPC server Lucene data persistent volume | `ReadWriteOnce` |
+| `extraVolumes` | Array of extra volumes to mount | `[]` |
+| `extraVolumeMounts` | Array of extra volume mounts | `[]` |
+| `ingress.enabled` | Enable Ingress | `true` |
+| `ingress.annotations` | Ingress annotations | See `values.yaml` |
+| `ingress.hosts` | Ingress hosts | See `values.yaml` |
+| `ingress.tls` | Ingress TLS configuration | See `values.yaml` |
+| `mariadbgalera.enabled` | Enable Galera cluster | `false` |
+| `mariadbgalera.rootUser.password` | Galera root user password | `""` |
+| `mariadbgalera.db.user` | Galera database user | `ilias` |
+| `mariadbgalera.db.password` | Galera database password | `""` |
+| `mariadbgalera.db.name` | Galera database name | `ilias` |
+| `mariadbgalera.persistence.enabled` | Enable persistence for Galera data | `true` |
+| `mariadbgalera.persistence.size` | Size of the persistent volume for Galera data | `10Gi` |
+| `mariadbgalera.galera.mariabackup.password` | Password for `mariabackup` | `secret` |
+| `mariadbgalera.mariadbConfiguration` | Custom MariaDB configuration for Galera | See `values.yaml` |
+| `mariadb.enabled` | Enable single MariaDB instance | `true` |
+| `mariadb.auth.username` | MariaDB user | `ilias` |
+| `mariadb.auth.password` | MariaDB user password | `""` |
+| `mariadb.auth.rootPassword` | MariaDB root password | `""` |
+| `mariadb.auth.database` | MariaDB database name | `ilias` |
+| `mariadb.persistence.enabled` | Enable persistence for MariaDB data | `true` |
+| `mariadb.persistence.size` | Size of the persistent volume for MariaDB data | `10Gi` |
+| `mariadb.primary.configuration` | Custom MariaDB configuration | See `values.yaml` |
+| `mariadbBackup.enabled` | Enable MariaDB backups | `true` |
+| `mariadbBackup.schedule` | Backup schedule (cron expression) | `0 3 * * *` |
+| `mariadbBackup.volume.size`| Size of Backup volume | `4Gi` |
+| `cronjob.enabled` | Enables or disables the ILIAS cron job. | `true` |
+| `cronjob.image` | The Docker image to use for the cron job. | `srsolutions/ilias` |
+| `cronjob.tag` | The Docker image tag to use for the cron job. | `9-php8.2-apache` |
+| `cronjob.schedule` | The schedule for the cron job, using cron expression format. | `0 2 * * *` (Daily at 2 AM) |
 
-***
 
-# Editing this README
+# Thank you to
+Many thanks goes to these great projects:  
+* Ilias by ILIAS open source e-Learning e.V. - https://github.com/ILIAS-eLearning/ILIAS
+* Ilias Docker image by srsolutions ag - https://github.com/srsolutionsag/docker-ilias 
+* Bitnami Helm charts by Broadcom Inc. - https://github.com/bitnami/charts
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+# License
+This project is licensed under GPLv3.
