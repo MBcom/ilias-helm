@@ -35,6 +35,14 @@ ilias:
     upload_max_filesize = {{ .Values.ilias.maxUploadSize }}
     post_max_size = {{ .Values.ilias.maxUploadSize }}
     session.gc_maxlifetime = {{ .Values.ilias.sessionLifetime }}
+
+    opcache.enable=1
+    opcache.enable_cli=1
+    opcache.interned_strings_buffer=8
+    opcache.max_accelerated_files=10000
+    opcache.memory_consumption=128
+    opcache.save_comments=1
+    opcache.revalidate_freq=1
   clientIni: |-
     ; <?php exit; ?>
     [server]
@@ -236,14 +244,17 @@ ingress:
 mariadbGalera:
   enabled: true
   rootUser:
-    password: "" # If empty, a password will be generated. Overrides ilias.db.password if set.
+    password: ""
   db:
     user: ilias
-    password: "" # If empty, a password will be generated. Overrides ilias.db.password if set.
+    password: ""
     name: ilias
   persistence:
     enabled: true
     size: 10Gi
+  galera:
+    mariabackup:
+      password: "secret" # Change 
   mariadbConfiguration: |-
     [client]
     port=3306
