@@ -36,7 +36,7 @@ spec:
               - name: ILIAS_DB_HOST
                 value: {{ include "ilias.dbHost" . | quote }}
               - name: ILIAS_DB_USER
-                value: {{ .Values.ilias.db.user | default .Values.mariadb.auth.username | quote }}
+                value: {{  include "ilias.dbUser" . | quote }}
               - name: ILIAS_DB_PASSWORD
               {{- if .Values.ilias.db.password }}
                 value: {{ .Values.ilias.db.password | quote }}
@@ -47,7 +47,7 @@ spec:
                     key: mariadb-password
               {{- end }}
               - name: ILIAS_DB_NAME
-                value: {{ .Values.ilias.db.name | default .Values.mariadb.auth.database | quote }}
+                value: {{  include "ilias.dbName" . | quote }}
               - name: ILIAS_DB_DUMP
                 value: {{ .Values.ilias.db.dump | quote }}
               - name: ILIAS_CLIENT_NAME
@@ -129,7 +129,7 @@ spec:
             - name: ILIAS_DB_HOST
               value: {{ include "ilias.dbHost" . | quote }}
             - name: ILIAS_DB_USER
-              value: {{ .Values.ilias.db.user | default .Values.mariadb.auth.username | quote }}
+              value: {{  include "ilias.dbUser" . | quote }}
             - name: ILIAS_DB_PASSWORD
             {{- if .Values.ilias.db.password }}
               value: {{ .Values.ilias.db.password | quote }}
@@ -140,7 +140,7 @@ spec:
                   key: mariadb-password
             {{- end }}
             - name: ILIAS_DB_NAME
-              value: {{ .Values.ilias.db.name | default .Values.mariadb.auth.database | quote }}
+              value: {{  include "ilias.dbName" . | quote }}
             - name: ILIAS_DB_DUMP
               value: {{ .Values.ilias.db.dump | quote }}
             - name: ILIAS_CLIENT_NAME

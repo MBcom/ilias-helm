@@ -23,9 +23,9 @@ spec:
                   # Get MariaDB credentials and connection details from the subchart
                   MARIADB_HOST={{ include "ilias.dbHost" . | quote }}
                   MARIADB_PORT=3306
-                  MARIADB_USER={{ .Values.ilias.db.user | default .Values.mariadb.auth.username | quote }}
-                  MARIADB_PASSWORD={{ .Values.ilias.db.password | default .Values.mariadb.auth.password | quote }}
-                  DATABASE_NAME={{ .Values.ilias.db.name | default .Values.mariadb.auth.database | quote }}
+                  MARIADB_USER={{  include "ilias.dbUser" . | quote }}
+                  MARIADB_PASSWORD={{ include "ilias.dbPassword" . | quote }}
+                  DATABASE_NAME={{  include "ilias.dbName" . | quote }}
 
                   # Generate timestamped filename
                   TIMESTAMP=$(date +%Y%m%d)
@@ -39,7 +39,7 @@ spec:
 
                   echo "Backups in store:"
                   ls -lah /backups/
-                  echo "Finished backup successfully."
+                  echo "Finished backup successfully. You can use the toolbox deployment to access them. Please ensure that this deployment is scaled to zero when this cronjob is executed."
 
               volumeMounts:
                 - name: backup-volume

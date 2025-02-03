@@ -8,3 +8,8 @@ dependencies:
   - name: mariadb
     repository: https://charts.bitnami.com/bitnami
     version: 20.2.2
+    condition: mariadb.enabled
+  - name: mariadb-galera
+    repository: https://charts.bitnami.com/bitnami
+    version: 14.1.2
+    condition: mariadbGalera.enabled
