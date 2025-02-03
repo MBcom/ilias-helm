@@ -80,6 +80,18 @@ DB Name generator
 {{-   end -}}
 {{- end -}}
 
+{{/*
+MariaDB image
+*/}}
+{{- define "mariadbImage" -}}
+{{-   if .Values.mariadbgalera.enabled }}
+{{- .Values.mariadbgalera.image.repository }}:{{ .Values.mariadbgalera.image.tag }}
+{{-   else if .Values.mariadb.enabled }}
+{{- .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+{{-   else }}
+{{- .Values.ilias.image }}:{{ .Values.ilias.tag }}
+{{-   end -}}
+{{- end -}}
 
 {{/*
 Render templates from values.yaml .
