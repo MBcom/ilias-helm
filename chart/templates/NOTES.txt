@@ -20,3 +20,10 @@
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
+
+
+{{- if .Values.mariadbBackup.enabled }}
+Your MariaDB is automatically backupt. You can restore these backups by scaling up the ilias toolbox deployment. Please ensure that you need to scale down these deployment each time again to allow the backup cron job to be successfully executed.
+
+kubectl -n {{ .Release.Namespace }} scale deployment {{ .Release.Name }}-ilias-toolobox --replicas 1
+{{- end }}
