@@ -19,7 +19,7 @@ spec:
       containers:
         - name: ilias
           image: {{ .Values.ilias.image }}:{{ .Values.ilias.tag }}
-          command: ["apache2-foreground"]
+          command: ["/bin/bash", "-c", "sleep infinity"]
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -53,14 +53,7 @@ spec:
             - name: ILIAS_DB_USER
               value: {{  include "ilias.dbUser" . | quote }}
             - name: ILIAS_DB_PASSWORD
-            {{- if .Values.ilias.db.password }}
-              value: {{ .Values.ilias.db.password | quote }}
-            {{- else }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-mariadb
-                  key: mariadb-password
-            {{- end }}
+              value: {{ include "ilias.dbPassword" . | quote }}
             - name: ILIAS_DB_NAME
               value: {{  include "ilias.dbName" . | quote }}
             - name: ILIAS_DB_DUMP

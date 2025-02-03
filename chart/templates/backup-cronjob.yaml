@@ -13,7 +13,7 @@ spec:
             fsGroup: 1001
           containers:
             - name: mariadb-backup
-              image: {{ .Values.mariadbGalera.image.repository | default .Values.mariadb.image.repository }}:{{ .Values.mariadbGalera.image.tag | default .Values.mariadb.image.tag }}
+              image: {{ .Values.mariadbgalera.image.repository | default .Values.mariadb.image.repository }}:{{ .Values.mariadbgalera.image.tag | default .Values.mariadb.image.tag }}
               command:
                 - /bin/sh
                 - -c

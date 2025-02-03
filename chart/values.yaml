@@ -241,8 +241,8 @@ ingress:
       hosts:
         - ilias.example.com # Must match the host above
 
-mariadbGalera:
-  enabled: true
+mariadbgalera:
+  enabled: false
   rootUser:
     password: ""
   db:
@@ -387,7 +387,7 @@ mariadbGalera:
     # encrypt_tmp_disk_tables=ON
 
 mariadb:
-  enabled: false
+  enabled: true
   auth:
     username: ilias
     password: "" 
@@ -448,9 +448,10 @@ mariadb:
   # other mariadb values as needed
 
 ####
-# Not supported if mariadb oder mariadbGalera are both disabled.
+# Not supported if mariadb oder mariadbgalera are both disabled.
 ###
 mariadbBackup:
+  enabled: true
   enabled: true
   schedule: "0 3 * * *" # 3:00 AM daily
   volume:

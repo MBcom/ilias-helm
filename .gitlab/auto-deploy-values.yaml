@@ -24,7 +24,3 @@ ingress:
     - secretName: ilias-tls # Create this secret with your certificate
       hosts:
         - ilias.cluster01.service.cluster.relaxdays.on-rcs.com # Must match the host above
-
-mariadbGalera:
-  persistence:
-    storageClass: on-rcs-single

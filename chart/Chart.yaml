@@ -10,7 +10,7 @@ dependencies:
     version: 20.2.2
     condition: mariadb.enabled
   - name: mariadb-galera
-    alias: mariadbGalera
+    alias: mariadbgalera
     repository: https://charts.bitnami.com/bitnami
     version: 14.1.2
-    condition: mariadbGalera.enabled
+    condition: mariadbgalera.enabled

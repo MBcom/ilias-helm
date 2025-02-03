@@ -31,8 +31,8 @@ DB Host generator
 {{- define "ilias.dbHost" -}}
 {{-   if .Values.ilias.db.host }}
 {{- .Values.ilias.db.host }}
-{{-   else if .Values.mariadbGalera.enabled }}
-{{- .Release.Name }}-mariadb-galera
+{{-   else if .Values.mariadbgalera.enabled }}
+{{- .Release.Name }}-mariadbgalera
 {{-   else }}
 {{- .Release.Name }}-mariadb
 {{-   end -}}
@@ -45,8 +45,8 @@ DB Username generator
 {{- define "ilias.dbUser" -}}
 {{-   if .Values.ilias.db.user }}
 {{- .Values.ilias.db.user }}
-{{-   else if .Values.mariadbGalera.enabled }}
-{{- .Values.mariadbGalera.db.user }}
+{{-   else if .Values.mariadbgalera.enabled }}
+{{- .Values.mariadbgalera.db.user }}
 {{-   else }}
 {{- .Values.mariadb.auth.username }}
 {{-   end -}}
@@ -59,8 +59,8 @@ DB Password generator
 {{- define "ilias.dbPassword" -}}
 {{-   if .Values.ilias.db.password }}
 {{- .Values.ilias.db.user }}
-{{-   else if .Values.mariadbGalera.enabled }}
-{{- .Values.mariadbGalera.db.password }}
+{{-   else if .Values.mariadbgalera.enabled }}
+{{- .Values.mariadbgalera.db.password }}
 {{-   else }}
 {{- .Values.mariadb.auth.password }}
 {{-   end -}}
@@ -73,13 +73,12 @@ DB Name generator
 {{- define "ilias.dbName" -}}
 {{-   if .Values.ilias.db.name }}
 {{- .Values.ilias.db.user }}
-{{-   else if .Values.mariadbGalera.enabled }}
-{{- .Values.mariadbGalera.db.name }}
+{{-   else if .Values.mariadbgalera.enabled }}
+{{- .Values.mariadbgalera.db.name }}
 {{-   else }}
 {{- .Values.mariadb.auth.database }}
 {{-   end -}}
 {{- end -}}
-
 
 
 {{/*
