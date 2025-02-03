@@ -447,6 +447,9 @@ mariadb:
       # other custom my.cnf settings as needed
   # other mariadb values as needed
 
+####
+# Not supported if mariadb oder mariadbGalera are both disabled.
+###
 mariadbBackup:
   enabled: true
   schedule: "0 3 * * *" # 3:00 AM daily
