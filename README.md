@@ -12,14 +12,14 @@ This Helm chart deploys the ILIAS e-learning platform on a Kubernetes cluster. I
 1. Add the repository (if you haven't already):
 
 ```bash
-helm repo add ilias https://<your-repo-url> # Replace with your repo URL
+helm repo add ilias-helm https://relaxdays.github.io/ilias-helm/
 helm repo update
 ```
 
 2. Install the chart:
 
 ```bash
-helm install ilias ilias/ilias -n <your-namespace> # Replace with your release name and namespace
+helm install ilias ilias-helm/ilias -n <your-namespace> # Replace with your release name and namespace
 ```
 
 ## Uninstalling the Chart
